@@ -6,36 +6,23 @@ namespace GameOfLife
 {
     internal class Board
     {
-        public Cell[,] Field { private get; set; }
+        public bool[,] Field { get; set; }
         public Board(int m, int n)
         {
-            Field = new Cell[m,n];
+            Field = new bool[m,n];
             for (var i = 0; i < m; i++)
             {
                 for (var j = 0; j < n; j++)
                 {
-                    Field[i,j] = new Cell() { Position = (i,j) };
+                    Field[i,j] = false;
                     
                 }
             }
-
-            for (var i = 0; i < m; i++)
-            {
-                for (var j = 0; j < n; j++)
-                {
-                    var neighbours = GetNeighbours(i, j);
-                    foreach (var neighbour in neighbours)
-                    {
-                        if (neighbour.IsAlive) neighbour.NeighbourCount++;
-                        Field[i, j].OnChanged += neighbour.OnNeighborChanged;
-                    }
-                }
-            } 
         }
 
-        public List<Cell> GetNeighbours(int i, int j)
+        public List<bool> GetNeighbours(int i, int j)
         {
-            var res = new List<Cell>();
+            var res = new List<bool>();
             for (var m = i - 1; m <= i + 1; m++)
             {
                 for (var n = j - 1; n <= j + 1; n++)
@@ -47,16 +34,9 @@ namespace GameOfLife
             return res;
         }
 
-        public void Change()
-        {
-            // Сначала все клетки смотрят на текущих соседей и решают свою судьбу
-            foreach (var cell in Field) cell.Prepare();
+        
 
-            // Только когда ВСЕ решили, обновляем состояния (это обновит NeighbourCount для СЛЕДУЮЩЕГО хода)
-            foreach (var cell in Field) cell.Update();
-        }
-
-        public Cell this[int m, int n]
+        public bool this[int m, int n]
         {
             get {
                 int rows = Field.GetLength(0);
@@ -71,7 +51,7 @@ namespace GameOfLife
         }
 
         public Board Copy() {
-            return new Board(Field.GetLength(0), Field.GetLength(1)) { Field = (Cell[,])Field.Clone() };
+            return new Board(Field.GetLength(0), Field.GetLength(1)) { Field = (bool[,])Field.Clone() };
         }
 
         public override string ToString()
@@ -81,7 +61,7 @@ namespace GameOfLife
             {
                 for (var j = 0; j < Field.GetLength(1); j++)
                 {
-                    if (Field[i,j].IsAlive == true)
+                    if (Field[i,j] == true)
                     {
                         sb.Append("+");
                     } else
